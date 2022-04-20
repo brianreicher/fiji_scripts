@@ -1,6 +1,6 @@
 # fiji_scripts
 
-## Bicubic Upsampling: script for the automation of a user-selected upsampling value
+## Bicubic Upsampling: script for the automation of user-selected upsampling
 
 1. Open Fiji in your server
 2. From the "File" menu, open the _cubic_upsampling_.py script in the Fiji script editor
