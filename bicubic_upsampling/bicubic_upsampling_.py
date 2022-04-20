@@ -23,23 +23,21 @@ for i in images:
 
 def getOptions():  
 	gd = GenericDialog("Options")  
-	gd.addStringField("Name: ", "Default (<file name>_upsampled_<scaling_rate>")
-	gd.addStringField("Path to Save Files: ", "Default (original image location)")  
-	gd.addSlider("Scaling Rate: ", 1, 20, 100)  
+	gd.addDirectoryField('Ouput Directory for all Files', folder)
+	gd.addSlider("Upsampling Factor: ", 1, 20, 100)  
 	gd.showDialog()  
 	#Dialog box takes file_name and scale_value input params
 	if gd.wasCanceled():
 		return
 	# Read out the options  
-	name = gd.getNextString()
 	save = gd.getNextString()
 	scale = gd.getNextNumber()  
-	return name, save, scale
+	return save, scale
 
 options = getOptions()
 if options is not None:  
-  name, save, scale = options  #Export user input params
-  print('Cubic Upsampling Parameters: ' + name, save, scale)
+  save, scale = options  #Export user input params
+  print('Cubic Upsampling Parameters: ' + save, scale)
 
 open_images = []  
 for id in WM.getIDList():  
@@ -48,26 +46,14 @@ for id in WM.getIDList():
 def cubic_upsample(im): #Upsample helper func
 	return IJ.run(im, 'Scale...', 'x=' + str(scale) + ' y=' + str(scale) + ' interpolation=Bicubic create')
 
-def get_file_name(file_name): #Uses auto-generated filename unless default option is changed
-	if options[0].startswith('Default'):
-		return file_name
-	else:
-		return options[0]
-
-def get_save_path(): #Returns the users desired path for saving upsampled tiffs
-	if options[1].startswith('Default'):
-		return folder #Saves to original location if default param is unchaged
-	else:
-		return options[1] #Saves to desired location if default param is changed
-
-save_path = get_save_path() #Initiates save_path variable
-
 #Generates and saves upsampled file to the listed directory
 for i in range(0, len(open_images)):
 	cubic_upsample(open_images[i])
 	upsampled_image = IJ.getImage()
 	usi = str(upsampled_image)
 	start, end = usi.index('['),  usi.index(' ')
-	usi_sub = usi[start+2:end-7] #Trim file name to exclude info and .tif string
-	FileSaver(upsampled_image).saveAsTiff(save_path+usi_sub+'_upsampled_'+str(options[2])+'_.tif')
+	usi_sub = usi[start+2:end-7] + '_upsampled_'+str(options[1])+'.tif' #Trim file name to exclude info and .tif string
+	print('Succesfully saved at ' + options[0]+ usi_sub)
+	FileSaver(upsampled_image).saveAsTiff(options[0]+usi_sub)
 	#Add file info to contain --upsampled tag and pixel scale size
+
